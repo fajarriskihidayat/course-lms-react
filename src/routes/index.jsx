@@ -1,14 +1,19 @@
 import { createBrowserRouter } from "react-router-dom";
-import ManagerHome from "../pages/ManagerHome";
+import ManagerHomePage from "../pages/manager/home";
 import SignInPage from "../pages/SignIn";
 import SignUpPage from "../pages/SignUp";
 import SuccessCheckoutPage from "../pages/SuccessCheckout";
 import LayoutDashboard from "../components/Layout";
+import ManagerCoursePage from "../pages/manager/courses";
+import ManageCreateCoursePage from "../pages/manager/create-course";
+import ManageDetailPage from "../pages/manager/course-detail";
+import ManageCreateContentPage from "../pages/manager/create-content-course";
+import ManageCoursePreviewPage from "../pages/manager/course-preview";
 
 const router = createBrowserRouter([
   {
     path: "/",
-    element: <ManagerHome />,
+    element: <ManagerHomePage />,
   },
   {
     path: "/manager/sign-in",
@@ -28,7 +33,27 @@ const router = createBrowserRouter([
     children: [
       {
         index: true,
-        element: <ManagerHome />,
+        element: <ManagerHomePage />,
+      },
+      {
+        path: "/manager/courses",
+        element: <ManagerCoursePage />,
+      },
+      {
+        path: "/manager/courses/create",
+        element: <ManageCreateCoursePage />,
+      },
+      {
+        path: "/manager/courses/:id",
+        element: <ManageDetailPage />,
+      },
+      {
+        path: `/manager/courses/:id/create`,
+        element: <ManageCreateContentPage />,
+      },
+      {
+        path: "/manager/courses/:id/preview",
+        element: <ManageCoursePreviewPage />,
       },
     ],
   },
