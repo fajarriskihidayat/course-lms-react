@@ -1,10 +1,17 @@
 import React from "react";
-import { Outlet, useMatch } from "react-router-dom";
+import { Outlet, useLocation, useMatch } from "react-router-dom";
 import Header from "./Header";
 import Sidebar from "./Sidebar";
 
-const LayoutDashboard = () => {
-  const isPreviewPage = useMatch("/manager/courses/:id/preview");
+const LayoutDashboard = ({ isAdmin = true }) => {
+  const { pathname } = useLocation();
+  const isPreviewPage = useMatch(
+    pathname.includes("/manager")
+      ? "/manager/courses/:id/preview"
+      : "/student/detail-course/:id"
+  );
+
+  console.log({ isPreviewPage });
 
   return (
     <>
@@ -12,7 +19,7 @@ const LayoutDashboard = () => {
         <Outlet />
       ) : (
         <div className="flex min-h-screen">
-          <Sidebar />
+          <Sidebar isAdmin={isAdmin} />
           <main className="flex flex-col flex-1 gap-[30px] p-[30px] ml-[290px]">
             <Header />
             <Outlet />

@@ -1,16 +1,18 @@
-import React from "react";
+import { useNavigate } from "react-router-dom";
 import TextContent from "./components/TextContent";
 import VideoContent from "./components/VideoContent";
 
 const ManageCoursePreviewPage = () => {
+  const navigate = useNavigate();
+
   return (
     <div className="flex min-h-screen">
       <aside className="sidebar-container fixed h-[calc(100vh-20px)] w-full max-w-[330px] my-[10px] ml-[10px] bg-[#060A23] overflow-hidden flex flex-1 rounded-[20px]">
         <div className="scroll-container flex w-full overflow-y-scroll hide-scrollbar">
           <nav className="flex flex-col w-full h-fit p-[30px] gap-[30px] z-10">
             <a
-              href="manage-course.html"
-              className="font-semibold text-white hover:underline"
+              onClick={() => navigate(-1)}
+              className="font-semibold text-white hover:underline cursor-pointer"
             >
               <span>Back to Dashboard</span>
             </a>
