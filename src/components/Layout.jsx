@@ -11,8 +11,6 @@ const LayoutDashboard = ({ isAdmin = true }) => {
       : "/student/detail-course/:id"
   );
 
-  console.log({ isPreviewPage });
-
   return (
     <>
       {isPreviewPage !== null ? (

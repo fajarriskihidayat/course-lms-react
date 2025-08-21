@@ -1,7 +1,26 @@
-import React from "react";
+import { useMutation } from "@tanstack/react-query";
 import { Link } from "react-router-dom";
+import { postSignUp } from "../../services/authService";
 
-const Pricing = () => {
+const Pricing = ({ data }) => {
+  const { mutateAsync, isPending } = useMutation({
+    mutationFn: () => postSignUp(data),
+  });
+
+  const submitData = async () => {
+    try {
+      if (!data) {
+        return;
+      }
+
+      const response = await mutateAsync();
+
+      window.location.replace(response.data.midtrans_payment_url);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   return (
     <>
       <header className="flex flex-col items-center gap-5 text-center mt-[50px]">
@@ -132,13 +151,13 @@ const Pricing = () => {
           </div>
           <hr className="border-[#262A56]" />
           <div className="flex flex-col gap-3">
-            <Link to="#">
+            <button type="button" onClick={submitData} disabled={isPending}>
               <div className="flex items-center justify-center gap-3 w-full rounded-full border p-[14px_20px] transition-all duration-300 hover:bg-[#662FFF] hover:border-[#8661EE] hover:shadow-[-10px_-6px_10px_0_#7F33FF_inset] bg-[#662FFF] border-[#8661EE] shadow-[-10px_-6px_10px_0_#7F33FF_inset]">
                 <span className="font-semibold text-white">
                   Choose This Plan
                 </span>
               </div>
-            </Link>
+            </button>
             <Link to="#">
               <div className="flex items-center justify-center gap-3 w-full rounded-full border p-[14px_20px] transition-all duration-300 hover:bg-[#662FFF] hover:border-[#8661EE] hover:shadow-[-10px_-6px_10px_0_#7F33FF_inset] bg-[#070B24] border-[#24283E] shadow-[-10px_-6px_10px_0_#181A35_inset]">
                 <span className="font-semibold text-white">
