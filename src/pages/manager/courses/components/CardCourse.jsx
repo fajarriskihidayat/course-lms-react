@@ -1,13 +1,25 @@
+import { useMutation } from "@tanstack/react-query";
 import React from "react";
-import { Link } from "react-router-dom";
+import { Link, useRevalidator } from "react-router-dom";
+import { deleteCourse } from "../../../../services/courseService";
 
-const CardCourse = ({
-  id = 1,
-  imageUrl = "/assets/images/thumbnails/th-1.png",
-  name = "Responsive Design Triclorem",
-  totalStudents = 554,
-  category = "Programming",
-}) => {
+const CardCourse = ({ id, imageUrl, name, totalStudents, category }) => {
+  const { revalidate } = useRevalidator();
+
+  const { isPending, mutateAsync } = useMutation({
+    mutationFn: () => deleteCourse(id),
+  });
+
+  const handleDelete = async () => {
+    try {
+      await mutateAsync();
+
+      revalidate();
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   return (
     <div className="card flex items-center gap-5">
       <div className="flex shrink-0 w-[140px] h-[110px] rounded-[20px] bg-[#D9D9D9] overflow-hidden">
@@ -47,6 +59,14 @@ const CardCourse = ({
         >
           Manage
         </Link>
+        <button
+          type="button"
+          className="w-fit rounded-full bg-red-500 text-white p-[14px_20px] font-semibold text-nowrap cursor-pointer"
+          disabled={isPending}
+          onClick={handleDelete}
+        >
+          {isPending ? "Loading..." : "Delete"}
+        </button>
       </div>
     </div>
   );

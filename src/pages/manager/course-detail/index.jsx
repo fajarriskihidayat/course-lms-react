@@ -1,8 +1,10 @@
 import React from "react";
 import ListContent from "./components/ListContent";
-import { Link } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 
-const ManageDetailPage = () => {
+const ManageCourseDetailPage = () => {
+  const { id } = useParams();
+
   return (
     <>
       <div
@@ -27,12 +29,12 @@ const ManageDetailPage = () => {
           </h1>
         </div>
         <div className="flex items-center gap-3">
-          <a
-            href="#"
+          <Link
+            to={`/manager/courses/edit/${id}`}
             className="w-fit rounded-full border border-[#060A23] p-[14px_20px] font-semibold text-nowrap"
           >
             Edit Course
-          </a>
+          </Link>
           <Link
             to={`/manager/courses/${1}/preview`}
             className="w-fit rounded-full p-[14px_20px] font-semibold text-[#FFFFFF] bg-[#662FFF] text-nowrap"
@@ -92,4 +94,4 @@ const ManageDetailPage = () => {
   );
 };
 
-export default ManageDetailPage;
+export default ManageCourseDetailPage;
