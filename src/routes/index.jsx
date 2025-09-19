@@ -16,6 +16,7 @@ import SuccessCheckoutPage from "../pages/SuccessCheckout";
 import { getCategories } from "../services/categoryService";
 import { getCourseDetail, getCourses } from "../services/courseService";
 import { MANAGER_SESSION, STORAGE_KEY } from "../utils/const";
+import { getContentDetail } from "../services/contentService";
 
 const router = createBrowserRouter([
   {
@@ -97,14 +98,46 @@ const router = createBrowserRouter([
       },
       {
         path: "/manager/courses/:id",
+        loader: async ({ params }) => {
+          const course = await getCourseDetail(params.id);
+
+          return course?.data;
+        },
         element: <ManageCourseDetailPage />,
       },
       {
         path: `/manager/courses/:id/create`,
+        loader: async ({ params }) => {
+          const course = await getCourseDetail(params.id);
+
+          return {
+            imageUrl: course?.data.thumbnail_url,
+            content: null,
+          };
+        },
+        element: <ManageCreateContentPage />,
+      },
+      {
+        path: `/manager/courses/:id/edit/:contentId`,
+        loader: async ({ params }) => {
+          const course = await getCourseDetail(params.id);
+          const content = await getContentDetail(params.contentId);
+
+          return {
+            imageUrl: course?.data.thumbnail_url,
+            content: content?.data,
+          };
+        },
         element: <ManageCreateContentPage />,
       },
       {
         path: "/manager/courses/:id/preview",
+
+        loader: async ({ params }) => {
+          const course = await getCourseDetail(params.id, true);
+
+          return course?.data;
+        },
         element: <ManageCoursePreviewPage />,
       },
       {

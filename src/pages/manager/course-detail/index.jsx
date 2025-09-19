@@ -1,9 +1,11 @@
 import React from "react";
 import ListContent from "./components/ListContent";
-import { Link, useParams } from "react-router-dom";
+import { Link, useLoaderData, useParams } from "react-router-dom";
 
 const ManageCourseDetailPage = () => {
   const { id } = useParams();
+
+  const course = useLoaderData();
 
   return (
     <>
@@ -24,8 +26,7 @@ const ManageCourseDetailPage = () => {
       <header className="flex items-center justify-between gap-[30px]">
         <div>
           <h1 className="font-extrabold text-[28px] leading-[42px]">
-            Mastering React TypeScript 7 <br />
-            Website Development
+            {course?.name}
           </h1>
         </div>
         <div className="flex items-center gap-3">
@@ -36,7 +37,7 @@ const ManageCourseDetailPage = () => {
             Edit Course
           </Link>
           <Link
-            to={`/manager/courses/${1}/preview`}
+            to={`/manager/courses/${id}/preview`}
             className="w-fit rounded-full p-[14px_20px] font-semibold text-[#FFFFFF] bg-[#662FFF] text-nowrap"
           >
             Preview
@@ -49,7 +50,7 @@ const ManageCourseDetailPage = () => {
           className="flex shrink-0 w-[480px] h-[250px] rounded-[20px] bg-[#D9D9D9] overflow-hidden"
         >
           <img
-            src="/assets/images/thumbnails/th-4.png"
+            src={course?.thumbnail_url}
             className="w-full h-full object-cover"
             alt="thumbnail"
           />
@@ -61,7 +62,7 @@ const ManageCourseDetailPage = () => {
               className="w-8 h-8"
               alt="icon"
             />
-            <p className="font-semibold">12,489 Students</p>
+            <p className="font-semibold">{course?.students.length} Students</p>
           </div>
           <div className="flex flex-col rounded-[20px] border border-[#CFDBEF] p-5 gap-4">
             <img
@@ -69,7 +70,7 @@ const ManageCourseDetailPage = () => {
               className="w-8 h-8"
               alt="icon"
             />
-            <p className="font-semibold">Programming</p>
+            <p className="font-semibold">{course?.category.name}</p>
           </div>
           <div className="flex flex-col rounded-[20px] border border-[#CFDBEF] p-5 gap-4">
             <img
@@ -77,7 +78,7 @@ const ManageCourseDetailPage = () => {
               className="w-8 h-8"
               alt="icon"
             />
-            <p className="font-semibold">873 Contents</p>
+            <p className="font-semibold">{course?.details.length} Contents</p>
           </div>
           <div className="flex flex-col rounded-[20px] border border-[#CFDBEF] p-5 gap-4">
             <img
@@ -89,7 +90,7 @@ const ManageCourseDetailPage = () => {
           </div>
         </div>
       </section>
-      <ListContent />
+      <ListContent details={course?.details} courseId={course?._id} />
     </>
   );
 };

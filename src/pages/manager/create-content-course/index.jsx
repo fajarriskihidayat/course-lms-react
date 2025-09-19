@@ -1,4 +1,5 @@
 import { CKEditor } from "@ckeditor/ckeditor5-react";
+import { zodResolver } from "@hookform/resolvers/zod";
 import {
   ClassicEditor,
   Essentials,
@@ -16,8 +17,63 @@ import {
 } from "ckeditor5";
 
 import "ckeditor5/ckeditor5.css";
+import { useForm } from "react-hook-form";
+import { mutateContentSchema } from "../../../utils/schema";
+import { useLoaderData, useNavigate, useParams } from "react-router-dom";
+import { useMutation } from "@tanstack/react-query";
+import { createContent, updateContent } from "../../../services/contentService";
 
 const ManageCreateContentPage = () => {
+  const { imageUrl, content } = useLoaderData();
+  const navigate = useNavigate();
+  const { id, contentId } = useParams();
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    setValue,
+    watch,
+  } = useForm({
+    resolver: zodResolver(mutateContentSchema),
+    defaultValues: {
+      title: content?.title,
+      type: content?.type,
+      youtubeId: content?.youtubeId,
+      text: content?.text,
+    },
+  });
+
+  const type = watch("type");
+
+  const mutateCreate = useMutation({
+    mutationFn: (data) => createContent(data),
+  });
+
+  const mutateUpdate = useMutation({
+    mutationFn: (data) => updateContent(contentId, data),
+  });
+
+  const onSubmit = async (values) => {
+    try {
+      console.log({ values, content });
+
+      content === null
+        ? await mutateCreate.mutateAsync({
+            ...values,
+            courseId: id,
+          })
+        : await mutateUpdate.mutateAsync({
+            ...values,
+            courseId: id,
+          });
+
+      navigate(`/manager/courses/${id}`);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   return (
     <>
       <div
@@ -31,21 +87,21 @@ const ManageCreateContentPage = () => {
           Course
         </span>
         <span className="last-of-type:after:content-[''] last-of-type:font-semibold">
-          Add Content
+          {content === null ? "Add" : "Edit"} Content
         </span>
       </div>
       <header className="flex items-center justify-between gap-[30px]">
         <div className="flex items-center gap-[30px]">
           <div className="flex shrink-0 w-[150px] h-[100px] rounded-[20px] overflow-hidden bg-[#D9D9D9]">
             <img
-              src="/assets/images/thumbnails/th-1.png"
+              src={imageUrl}
               className="w-full h-full object-cover"
               alt="thumbnail"
             />
           </div>
           <div>
             <h1 className="font-extrabold text-[28px] leading-[42px]">
-              Add Content
+              {content === null ? "Add" : "Edit"} Content
             </h1>
             <p className="text-[#838C9D] mt-[1]">
               Give a best content for the course
@@ -54,7 +110,7 @@ const ManageCreateContentPage = () => {
         </div>
       </header>
       <form
-        action="manage-course-materi.html"
+        onSubmit={handleSubmit(onSubmit)}
         className="flex flex-col w-[930px] rounded-[30px] p-[30px] gap-[30px] bg-[#F8FAFB]"
       >
         <div className="flex flex-col gap-[10px]">
@@ -69,13 +125,15 @@ const ManageCreateContentPage = () => {
             />
             <input
               type="text"
-              name="title"
               id="title"
               className="appearance-none outline-none w-full py-3 font-semibold placeholder:font-normal placeholder:text-[#838C9D] !bg-transparent"
               placeholder="Write better name for your course"
-              required=""
+              {...register("title")}
             />
           </div>
+          <span className="error-message text-[#FF435A]">
+            {errors?.title?.message}
+          </span>
         </div>
         <div className="flex flex-col gap-[10px]">
           <label htmlFor="type" className="font-semibold">
@@ -88,16 +146,15 @@ const ManageCreateContentPage = () => {
               alt="icon"
             />
             <select
-              name="type"
               id="type"
               className="appearance-none outline-none w-full py-3 px-2 -mx-2 font-semibold placeholder:font-normal placeholder:text-[#838C9D] !bg-transparent"
+              {...register("type")}
             >
               <option value="" hidden="">
                 Choose content type
               </option>
-              <option value="">test</option>
-              <option value="">test</option>
-              <option value="">test</option>
+              <option value="video">Video</option>
+              <option value="text">Text</option>
             </select>
             <img
               src="/assets/images/icons/arrow-down.svg"
@@ -105,80 +162,103 @@ const ManageCreateContentPage = () => {
               alt="icon"
             />
           </div>
+          <span className="error-message text-[#FF435A]">
+            {errors?.type?.message}
+          </span>
         </div>
-        <div className="flex flex-col gap-[10px]">
-          <label htmlFor="video" className="font-semibold">
-            Youtube Video ID
-          </label>
-          <div className="flex items-center w-full rounded-full border border-[#CFDBEF] gap-3 px-5 transition-all duration-300 focus-within:ring-2 focus-within:ring-[#662FFF]">
-            <img
-              src="/assets/images/icons/bill-black.svg"
-              className="w-6 h-6"
-              alt="icon"
-            />
-            <input
-              type="text"
-              name="video"
-              id="video"
-              className="appearance-none outline-none w-full py-3 font-semibold placeholder:font-normal placeholder:text-[#838C9D] !bg-transparent"
-              placeholder="Write tagline for better copy"
-            />
+        {type === "video" && (
+          <div className="flex flex-col gap-[10px]">
+            <label htmlFor="video" className="font-semibold">
+              Youtube Video ID
+            </label>
+            <div className="flex items-center w-full rounded-full border border-[#CFDBEF] gap-3 px-5 transition-all duration-300 focus-within:ring-2 focus-within:ring-[#662FFF]">
+              <img
+                src="/assets/images/icons/bill-black.svg"
+                className="w-6 h-6"
+                alt="icon"
+              />
+              <input
+                type="text"
+                id="video"
+                className="appearance-none outline-none w-full py-3 font-semibold placeholder:font-normal placeholder:text-[#838C9D] !bg-transparent"
+                placeholder="Write tagline for better copy"
+                {...register("youtubeId")}
+              />
+            </div>
+            <span className="error-message text-[#FF435A]">
+              {errors?.youtubeId?.message}
+            </span>
           </div>
-        </div>
-        <div className="flex flex-col gap-[10px]">
-          <label className="font-semibold">Content Text</label>
-          <CKEditor
-            editor={ClassicEditor}
-            config={{
-              licenseKey: "GPL",
-              plugins: [
-                Essentials,
-                Paragraph,
-                Bold,
-                Italic,
-                Heading,
-                Indent,
-                IndentBlock,
-                Link,
-                List,
-                MediaEmbed,
-                Table,
-                Undo,
-              ],
-              toolbar: [
-                "undo",
-                "redo",
-                "|",
-                "heading",
-                "|",
-                "bold",
-                "italic",
-                "|",
-                "link",
-                "insertTable",
-                "mediaEmbed",
-                "|",
-                "bulletedList",
-                "numberedList",
-                "indent",
-                "outdent",
-              ],
-              // initialData: "<p>Hello from CKEditor 5 in React!</p>",
-            }}
-          />
-        </div>
+        )}
+        {type === "text" && (
+          <div className="flex flex-col gap-[10px]">
+            <label className="font-semibold">Content Text</label>
+            <CKEditor
+              editor={ClassicEditor}
+              config={{
+                licenseKey: "GPL",
+                plugins: [
+                  Essentials,
+                  Paragraph,
+                  Bold,
+                  Italic,
+                  Heading,
+                  Indent,
+                  IndentBlock,
+                  Link,
+                  List,
+                  MediaEmbed,
+                  Table,
+                  Undo,
+                ],
+                toolbar: [
+                  "undo",
+                  "redo",
+                  "|",
+                  "heading",
+                  "|",
+                  "bold",
+                  "italic",
+                  "|",
+                  "link",
+                  "insertTable",
+                  "mediaEmbed",
+                  "|",
+                  "bulletedList",
+                  "numberedList",
+                  "indent",
+                  "outdent",
+                ],
+                initialData: content?.text,
+              }}
+              onChange={(_, editor) => {
+                const data = editor.getData();
+
+                setValue("text", data);
+              }}
+            />
+            <span className="error-message text-[#FF435A]">
+              {errors?.text?.message}
+            </span>
+          </div>
+        )}
         <div className="flex items-center gap-[14px]">
           <button
-            type="submit"
+            type="button"
             className="w-full rounded-full border border-[#060A23] p-[14px_20px] font-semibold text-nowrap"
           >
             Save as Draft
           </button>
           <button
             type="submit"
-            className="w-full rounded-full p-[14px_20px] font-semibold text-[#FFFFFF] bg-[#662FFF] text-nowrap"
+            disabled={
+              content === null ? mutateCreate.isPending : mutateUpdate.isPending
+            }
+            className="w-full rounded-full p-[14px_20px] font-semibold text-[#FFFFFF] bg-[#662FFF] text-nowrap cursor-pointer"
           >
-            Add Content Now
+            {mutateCreate.isPending || mutateUpdate.isPending
+              ? "Loading..."
+              : `${content === null ? "Add" : "Edit"} Content Now`}
           </button>
         </div>
       </form>

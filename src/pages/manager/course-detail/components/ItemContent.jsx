@@ -1,13 +1,24 @@
-import React from "react";
-import { Link } from "react-router-dom";
+import { useMutation } from "@tanstack/react-query";
+import { Link, useRevalidator } from "react-router-dom";
+import { deleteContent } from "../../../../services/contentService";
 
-const ItemContent = ({
-  id = 1,
-  index = 1,
-  type = "video",
-  title = "Install VSCode di Windows",
-  courseId = 2,
-}) => {
+const ItemContent = ({ id, index, type, title, courseId }) => {
+  const { revalidate } = useRevalidator();
+
+  const { isPending, mutateAsync } = useMutation({
+    mutationFn: () => deleteContent(id),
+  });
+
+  const handleDelete = async () => {
+    try {
+      await mutateAsync();
+
+      revalidate();
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   return (
     <div className="card flex items-center gap-5">
       <div className="relative flex shrink-0 w-[140px] h-[110px] ">
@@ -23,13 +34,15 @@ const ItemContent = ({
         </div>
       </div>
       <div className="w-full">
-        <h3 className="font-bold text-xl leading-[30px] line-clamp-1">
+        <h3 className="font-bold text-xl leading-[30px] line-clamp-1 hover:line-clamp-none">
           {title}
         </h3>
         <div className="flex items-center gap-5">
           <div className="flex items-center gap-[6px] mt-[6px]">
             <img
-              src="/assets/images/icons/note-favorite-purple.svg"
+              src={`/assets/images/icons/${
+                type === "video" ? "video-play-purple" : "note-favorite-purple"
+              }.svg`}
               className="w-5 h-5"
               alt="icon"
             />
@@ -48,9 +61,11 @@ const ItemContent = ({
         </Link>
         <button
           type="button"
-          className="w-fit rounded-full p-[14px_20px] bg-[#FF435A] font-semibold text-white text-nowrap"
+          disabled={isPending}
+          className="w-fit rounded-full p-[14px_20px] bg-[#FF435A] font-semibold text-white text-nowrap cursor-pointer"
+          onClick={handleDelete}
         >
-          Delete
+          {isPending ? "Loading..." : "Delete"}
         </button>
       </div>
     </div>

@@ -22,7 +22,7 @@ const ManageCreateCoursePage = () => {
     ),
     defaultValues: {
       name: data?.course?.name,
-      categoryId: data?.course?.category,
+      categoryId: data?.course?.category._id,
       tagline: data?.course?.tagline,
       description: data?.course?.description,
     },
