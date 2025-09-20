@@ -38,6 +38,10 @@ const SignInPage = () => {
 
       secureLocalStorage.setItem(STORAGE_KEY, response.data);
 
+      if (window.history.length > 2) {
+        navigate(-1);
+      }
+
       if (response.data.role === "manager") {
         navigate("/manager");
       } else {
