@@ -28,7 +28,9 @@ const ManageCreateCoursePage = () => {
     },
   });
 
-  const [file, setFile] = useState(null);
+  const [file, setFile] = useState(
+    data.course ? data.course.thumbnail_url : null
+  );
   const inputFileRef = useRef(null);
 
   const mutateCreate = useMutation({
@@ -44,7 +46,7 @@ const ManageCreateCoursePage = () => {
       const formData = new FormData();
 
       formData.append("name", values.name);
-      formData.append("thumbnail", file);
+      formData.append("thumbnail", typeof file !== "string" ? file : "");
       formData.append("tagline", values.tagline);
       formData.append("categoryId", values.categoryId);
       formData.append("description", values.description);
@@ -114,7 +116,9 @@ const ManageCreateCoursePage = () => {
             <button
               type="button"
               id="trigger-input"
-              className="absolute top-0 left-0 w-full h-full flex justify-center items-center gap-3 z-0 cursor-pointer"
+              className={`absolute top-0 left-0 w-full h-full flex justify-center items-center gap-3 z-0 cursor-pointer  ${
+                !file ? "block" : "hidden"
+              }`}
               onClick={() => inputFileRef?.current?.click()}
             >
               <img
@@ -126,7 +130,13 @@ const ManageCreateCoursePage = () => {
             </button>
             <img
               id="thumbnail-preview"
-              src={file ? URL.createObjectURL(file) : ""}
+              src={
+                file
+                  ? typeof file === "string"
+                    ? file
+                    : URL.createObjectURL(file)
+                  : ""
+              }
               className={`w-full h-full object-cover ${
                 file ? "block" : "hidden"
               }`}
@@ -135,7 +145,13 @@ const ManageCreateCoursePage = () => {
             <button
               type="button"
               id="delete-preview"
-              className="absolute right-[10px] bottom-[10px] w-12 h-12 rounded-full z-10 hidden"
+              className={`absolute cursor-pointer right-[10px] bottom-[10px] w-12 h-12 rounded-full z-10 ${
+                file ? "block" : "hidden"
+              }`}
+              onClick={() => {
+                setFile(null);
+                setValue("thumbnail", null);
+              }}
             >
               <img src="/assets/images/icons/delete.svg" alt="delete" />
             </button>
@@ -251,7 +267,7 @@ const ManageCreateCoursePage = () => {
                 ? mutateCreate.isPending
                 : mutateUpdate.isPending
             }
-            className="w-full rounded-full p-[14px_20px] font-semibold text-[#FFFFFF] bg-[#662FFF] text-nowrap"
+            className="w-full cursor-pointer rounded-full p-[14px_20px] font-semibold text-[#FFFFFF] bg-[#662FFF] text-nowrap"
           >
             {mutateCreate.isPending || mutateUpdate.isPending
               ? "Loading..."

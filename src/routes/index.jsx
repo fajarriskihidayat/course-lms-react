@@ -17,6 +17,8 @@ import { getCategories } from "../services/categoryService";
 import { getCourseDetail, getCourses } from "../services/courseService";
 import { MANAGER_SESSION, STORAGE_KEY } from "../utils/const";
 import { getContentDetail } from "../services/contentService";
+import { getDetailStudent, getStudents } from "../services/studentService";
+import ManageStudentCreatePage from "../pages/manager/student-create";
 
 const router = createBrowserRouter([
   {
@@ -142,7 +144,28 @@ const router = createBrowserRouter([
       },
       {
         path: "/manager/students",
+        loader: async () => {
+          const students = await getStudents();
+
+          return students?.data;
+        },
         element: <ManageStudentsPage />,
+      },
+      {
+        path: "/manager/students/create",
+        loader: () => {
+          return null;
+        },
+        element: <ManageStudentCreatePage />,
+      },
+      {
+        path: "/manager/students/:id/edit",
+        loader: async ({ params }) => {
+          const student = await getDetailStudent(params.id);
+
+          return student?.data;
+        },
+        element: <ManageStudentCreatePage />,
       },
     ],
   },

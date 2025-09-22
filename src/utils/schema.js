@@ -33,7 +33,7 @@ export const createCourseSchema = z.object({
     .refine((file) => file?.name, { message: "Thumbnail is required" }),
 });
 
-export const updateCourseSchema = createCourseSchema.partial({
+export const updateCourseSchema = createCourseSchema.omit({
   thumbnail: true,
 });
 
@@ -68,3 +68,15 @@ export const mutateContentSchema = z
       }
     }
   });
+
+export const createStudentSchema = z.object({
+  name: z.string().nonempty({ message: "Name is required" }),
+  email: z.string().nonempty({ message: "Email is required" }).email(),
+  password: z.string().nonempty({ message: "Password is required" }),
+  photo: z.any().refine((file) => file?.name, { message: "Photo is required" }),
+});
+
+export const updateStudentSchema = createStudentSchema.omit({
+  photo: true,
+  password: true,
+});
