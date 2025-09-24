@@ -14,11 +14,17 @@ import SignUpPage from "../pages/SignUp";
 import StudentPage from "../pages/student/student-overview";
 import SuccessCheckoutPage from "../pages/SuccessCheckout";
 import { getCategories } from "../services/categoryService";
-import { getCourseDetail, getCourses } from "../services/courseService";
+import {
+  getCourseDetail,
+  getCourses,
+  getStudentsByCourse,
+} from "../services/courseService";
 import { MANAGER_SESSION, STORAGE_KEY } from "../utils/const";
 import { getContentDetail } from "../services/contentService";
 import { getDetailStudent, getStudents } from "../services/studentService";
 import ManageStudentCreatePage from "../pages/manager/student-create";
+import StudentCoursePage from "../pages/manager/student-course";
+import AddStudentForm from "../pages/manager/student-course/components/AddStudentForm";
 
 const router = createBrowserRouter([
   {
@@ -166,6 +172,24 @@ const router = createBrowserRouter([
           return student?.data;
         },
         element: <ManageStudentCreatePage />,
+      },
+      {
+        path: "/manager/courses/students/:id",
+        loader: async ({ params }) => {
+          const course = await getStudentsByCourse(params.id);
+
+          return course?.data;
+        },
+        element: <StudentCoursePage />,
+      },
+      {
+        path: "/manager/courses/students/:id/add",
+        loader: async () => {
+          const students = await getStudents();
+
+          return students?.data;
+        },
+        element: <AddStudentForm />,
       },
     ],
   },

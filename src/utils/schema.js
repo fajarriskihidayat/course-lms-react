@@ -80,3 +80,7 @@ export const updateStudentSchema = createStudentSchema.omit({
   photo: true,
   password: true,
 });
+
+export const mutateStudentCourseSchema = z.object({
+  studentId: z.string().nonempty({ message: "Please choose student" }),
+});
