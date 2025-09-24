@@ -1,8 +1,11 @@
 import React from "react";
 import Courses from "./components/Courses";
 import Students from "./components/Students";
+import { useLoaderData } from "react-router-dom";
 
 const ManagerHome = () => {
+  const overviews = useLoaderData();
+
   return (
     <>
       <header className="flex items-center justify-between gap-[30px]">
@@ -39,7 +42,9 @@ const ManagerHome = () => {
               alt="icon"
             />
             <div>
-              <p className="font-extrabold text-2xl leading-[36px]">189,498</p>
+              <p className="font-extrabold text-2xl leading-[36px]">
+                {overviews.totalStudents}
+              </p>
               <p className="text-[#838C9D]">Total Students</p>
             </div>
           </div>
@@ -50,7 +55,9 @@ const ManagerHome = () => {
               alt="icon"
             />
             <div>
-              <p className="font-extrabold text-2xl leading-[36px]">7,221</p>
+              <p className="font-extrabold text-2xl leading-[36px]">
+                {overviews.totalCourses}
+              </p>
               <p className="text-[#838C9D]">Total Courses</p>
             </div>
           </div>
@@ -61,7 +68,9 @@ const ManagerHome = () => {
               alt="icon"
             />
             <div>
-              <p className="font-extrabold text-2xl leading-[36px]">893,891</p>
+              <p className="font-extrabold text-2xl leading-[36px]">
+                {overviews.totalVideos}
+              </p>
               <p className="text-[#838C9D]">Video Content</p>
             </div>
           </div>
@@ -72,7 +81,9 @@ const ManagerHome = () => {
               alt="icon"
             />
             <div>
-              <p className="font-extrabold text-2xl leading-[36px]">12,812</p>
+              <p className="font-extrabold text-2xl leading-[36px]">
+                {overviews.totalTexts}
+              </p>
               <p className="text-[#838C9D]">Text Content</p>
             </div>
           </div>

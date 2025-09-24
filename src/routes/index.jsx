@@ -25,6 +25,7 @@ import { getDetailStudent, getStudents } from "../services/studentService";
 import ManageStudentCreatePage from "../pages/manager/student-create";
 import StudentCoursePage from "../pages/manager/student-course";
 import AddStudentForm from "../pages/manager/student-course/components/AddStudentForm";
+import { getOverviews } from "../services/overviewService";
 
 const router = createBrowserRouter([
   {
@@ -33,10 +34,28 @@ const router = createBrowserRouter([
   },
   {
     path: "/manager/sign-in",
+    loader: async () => {
+      const session = secureLocalStorage.getItem(STORAGE_KEY);
+
+      if (session && session.role === "manager") {
+        throw redirect("/manager");
+      }
+
+      return true;
+    },
     element: <SignInPage />,
   },
   {
     path: "/manager/sign-up",
+    loader: async () => {
+      const session = secureLocalStorage.getItem(STORAGE_KEY);
+
+      if (session && session.role === "manager") {
+        throw redirect("/manager");
+      }
+
+      return true;
+    },
     element: <SignUpPage />,
   },
   {
@@ -49,21 +68,21 @@ const router = createBrowserRouter([
     loader: async () => {
       const session = secureLocalStorage.getItem(STORAGE_KEY);
 
-      const isTokenExpired = (token) => {
-        const decode = jwtDecode(token);
-        const now = Math.floor(Date.now() / 1000); // detik sekarang
+      // const isTokenExpired = (token) => {
+      //   const decode = jwtDecode(token);
+      //   const now = Math.floor(Date.now() / 1000); // detik sekarang
 
-        if (decode.exp < now) {
-          return true;
-        } else {
-          return false;
-        }
-      };
+      //   if (decode.exp < now) {
+      //     return true;
+      //   } else {
+      //     return false;
+      //   }
+      // };
 
       if (
         !session ||
-        session.role !== "manager" ||
-        isTokenExpired(session.token)
+        session.role !== "manager"
+        // || isTokenExpired(session.token)
       ) {
         throw redirect("/manager/sign-in");
       }
@@ -74,6 +93,11 @@ const router = createBrowserRouter([
     children: [
       {
         index: true,
+        loader: async () => {
+          const overviews = await getOverviews();
+
+          return overviews?.data;
+        },
         element: <ManagerHomePage />,
       },
       {
