@@ -1,9 +1,11 @@
 import React from "react";
-import { Outlet, useLocation, useMatch } from "react-router-dom";
+import { Outlet, useLoaderData, useLocation, useMatch } from "react-router-dom";
 import Header from "./Header";
 import Sidebar from "./Sidebar";
 
 const LayoutDashboard = ({ isAdmin = true }) => {
+  const session = useLoaderData();
+
   const { pathname } = useLocation();
   const isPreviewPage = useMatch(
     pathname.includes("/manager")
@@ -19,7 +21,7 @@ const LayoutDashboard = ({ isAdmin = true }) => {
         <div className="flex min-h-screen">
           <Sidebar isAdmin={isAdmin} />
           <main className="flex flex-col flex-1 gap-[30px] p-[30px] ml-[290px]">
-            <Header />
+            <Header type={session?.role} />
             <Outlet />
           </main>
         </div>

@@ -1,7 +1,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import Navbar from "../../components/Navbar";
 import { postSignIn } from "../../services/authService";
 import { signInSchema } from "../../utils/schema";
@@ -10,8 +10,10 @@ import { AxiosError } from "axios";
 import secureLocalStorage from "react-secure-storage";
 import { STORAGE_KEY } from "../../utils/const";
 
-const SignInPage = () => {
+const SignInPage = ({ type = "manager" }) => {
   const navigate = useNavigate();
+  const { pathname } = useLocation();
+
   const [errorMsg, setErrorMsg] = useState("");
 
   const {
@@ -36,9 +38,20 @@ const SignInPage = () => {
 
       const response = await mutateAsync(data);
 
+      if (pathname === "/manager/sign-in" && response.data.role === "student") {
+        return setErrorMsg(
+          "Anda bukan manager course. Silahkan ke halaman student"
+        );
+      } else if (
+        pathname === "/student/sign-in" &&
+        response.data.role === "manager"
+      ) {
+        return setErrorMsg("Anda bukan student. Silahkan ke halaman manager");
+      }
+
       secureLocalStorage.setItem(STORAGE_KEY, response.data);
 
-      if (window.history.length > 2) {
+      if (localStorage.getItem("isLastPath")) {
         navigate(-1);
       }
 
@@ -67,7 +80,7 @@ const SignInPage = () => {
           alt=""
         />
       </div>
-      <Navbar />
+      <Navbar type={type} />
       <form
         onSubmit={handleSubmit(onSubmit)}
         className="flex flex-col w-[400px] h-fit rounded-[20px] border border-[#262A56] p-[30px] gap-[30px] bg-[#080A2A] m-auto"
@@ -140,9 +153,11 @@ const SignInPage = () => {
         <button
           type="submit"
           disabled={isPending}
-          className="w-full disabled:opacity-30 rounded-full border p-[14px_20px] text-center font-semibold  text-white bg-[#662FFF] border-[#8661EE] shadow-[-10px_-6px_10px_0_#7F33FF_inset]"
+          className="w-full disabled:opacity-30 cursor-pointer rounded-full border p-[14px_20px] text-center font-semibold  text-white bg-[#662FFF] border-[#8661EE] shadow-[-10px_-6px_10px_0_#7F33FF_inset]"
         >
-          Sign In to Manage
+          {isPending
+            ? "Loading..."
+            : `Sign In ${type === "manager" ? "to Manage" : ""}`}
         </button>
       </form>
     </div>

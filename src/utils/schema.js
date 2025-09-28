@@ -6,10 +6,7 @@ export const signUpSchema = z.object({
     .string()
     .min(1, { message: "Email is required" })
     .email({ message: "Email is invalid" }),
-  password: z
-    .string()
-    .nonempty({ message: "Password is required" })
-    .min(5, { message: "Password should have min 5 character" }),
+  password: z.string().nonempty({ message: "Password is required" }),
 });
 
 export const signInSchema = signUpSchema.omit({ name: true });
@@ -76,10 +73,9 @@ export const createStudentSchema = z.object({
   photo: z.any().refine((file) => file?.name, { message: "Photo is required" }),
 });
 
-export const updateStudentSchema = createStudentSchema.omit({
-  photo: true,
-  password: true,
-});
+export const updateStudentSchema = createStudentSchema
+  .omit({ photo: true })
+  .extend({ password: z.string().optional() });
 
 export const mutateStudentCourseSchema = z.object({
   studentId: z.string().nonempty({ message: "Please choose student" }),

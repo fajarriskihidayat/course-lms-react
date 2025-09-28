@@ -1,7 +1,9 @@
-import { Link } from "react-router-dom";
+import { Link, useLoaderData } from "react-router-dom";
 import CardCourse from "./components/CardCourse";
 
 const StudentPage = () => {
+  const courses = useLoaderData();
+
   return (
     <section
       id="LatestCourse"
@@ -10,7 +12,15 @@ const StudentPage = () => {
       <h2 className="font-extrabold text-[22px] leading-[33px]">
         Latest Courses
       </h2>
-      <CardCourse />
+      {courses.map((item) => (
+        <CardCourse
+          key={item._id}
+          id={item._id}
+          category={item.category.name}
+          imageUrl={item.thumbnail_url}
+          title={item.name}
+        />
+      ))}
     </section>
   );
 };

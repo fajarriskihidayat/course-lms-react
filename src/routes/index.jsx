@@ -19,9 +19,13 @@ import {
   getCourses,
   getStudentsByCourse,
 } from "../services/courseService";
-import { MANAGER_SESSION, STORAGE_KEY } from "../utils/const";
+import { MANAGER_SESSION, STORAGE_KEY, STUDENT_SESSION } from "../utils/const";
 import { getContentDetail } from "../services/contentService";
-import { getDetailStudent, getStudents } from "../services/studentService";
+import {
+  getCoursesStudent,
+  getDetailStudent,
+  getStudents,
+} from "../services/studentService";
 import ManageStudentCreatePage from "../pages/manager/student-create";
 import StudentCoursePage from "../pages/manager/student-course";
 import AddStudentForm from "../pages/manager/student-course/components/AddStudentForm";
@@ -84,6 +88,7 @@ const router = createBrowserRouter([
         session.role !== "manager"
         // || isTokenExpired(session.token)
       ) {
+        localStorage.setItem("isLastPath", true);
         throw redirect("/manager/sign-in");
       }
 
@@ -164,7 +169,6 @@ const router = createBrowserRouter([
       },
       {
         path: "/manager/courses/:id/preview",
-
         loader: async ({ params }) => {
           const course = await getCourseDetail(params.id, true);
 
@@ -219,17 +223,66 @@ const router = createBrowserRouter([
   },
   {
     path: "/student",
+    id: STUDENT_SESSION,
+    loader: async () => {
+      const session = secureLocalStorage.getItem(STORAGE_KEY);
+
+      // const isTokenExpired = (token) => {
+      //   const decode = jwtDecode(token);
+      //   const now = Math.floor(Date.now() / 1000); // detik sekarang
+
+      //   if (decode.exp < now) {
+      //     return true;
+      //   } else {
+      //     return false;
+      //   }
+      // };
+
+      if (
+        !session ||
+        session.role !== "student"
+        // || isTokenExpired(session.token)
+      ) {
+        localStorage.setItem("isLastPath", true);
+        throw redirect("/student/sign-in");
+      }
+
+      return session;
+    },
     element: <LayoutDashboard isAdmin={false} />,
     children: [
       {
         index: true,
+        loader: async () => {
+          const courses = await getCoursesStudent();
+
+          return courses?.data;
+        },
         element: <StudentPage />,
       },
       {
         path: "/student/detail-course/:id",
-        element: <ManageCoursePreviewPage />,
+        loader: async ({ params }) => {
+          const course = await getCourseDetail(params.id, true);
+
+          return course?.data;
+        },
+        element: <ManageCoursePreviewPage isAdmin={false} />,
       },
     ],
+  },
+  {
+    path: "/student/sign-in",
+    loader: async () => {
+      const session = secureLocalStorage.getItem(STORAGE_KEY);
+
+      if (session && session.role === "student") {
+        throw redirect("/student");
+      }
+
+      return true;
+    },
+    element: <SignInPage type="student" />,
   },
 ]);
 

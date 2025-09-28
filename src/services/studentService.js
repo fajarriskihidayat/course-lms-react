@@ -6,6 +6,9 @@ export const getStudents = async () =>
 export const getDetailStudent = async (id) =>
   apiInstanceAuth.get(`/students/${id}`).then((res) => res.data);
 
+export const getCoursesStudent = async () =>
+  apiInstanceAuth.get("/students/courses").then((res) => res.data);
+
 export const createStudent = async (data) =>
   apiInstanceAuth
     .post("/students", data, {

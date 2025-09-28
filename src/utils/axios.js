@@ -30,8 +30,16 @@ apiInstanceAuth.interceptors.response.use(
   (response) => response,
   (err) => {
     if (err?.response?.status === 400) {
-      window.location.replace("/manager/sign-in");
+      const session = secureLocalStorage.getItem(STORAGE_KEY);
+
+      if (session?.role === "manager") {
+        window.location.replace("/manager/sign-in");
+      } else {
+        window.location.replace("/student/sign-in");
+      }
+
       secureLocalStorage.removeItem(STORAGE_KEY);
+      localStorage.removeItem("isLastPath");
     }
 
     return Promise.reject("Err");

@@ -1,7 +1,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
 
-const Navbar = () => {
+const Navbar = ({ type }) => {
   return (
     <nav className="flex items-center justify-between p-[30px]">
       <div className="flex items-center gap-[60px]">
@@ -31,11 +31,13 @@ const Navbar = () => {
             <span className="font-semibold text-white">My Dashboard</span>
           </div>
         </Link>
-        <Link to="/manager/sign-up">
-          <div className="flex items-center gap-3 w-fit rounded-full border p-[14px_20px] transition-all duration-300 hover:bg-[#662FFF] hover:border-[#8661EE] hover:shadow-[-10px_-6px_10px_0_#7F33FF_inset] bg-[#662FFF] border-[#8661EE] shadow-[-10px_-6px_10px_0_#7F33FF_inset]">
-            <span className="font-semibold text-white">Sign Up</span>
-          </div>
-        </Link>
+        {type === "manager" && (
+          <Link to="/manager/sign-up">
+            <div className="flex items-center gap-3 w-fit rounded-full border p-[14px_20px] transition-all duration-300 hover:bg-[#662FFF] hover:border-[#8661EE] hover:shadow-[-10px_-6px_10px_0_#7F33FF_inset] bg-[#662FFF] border-[#8661EE] shadow-[-10px_-6px_10px_0_#7F33FF_inset]">
+              <span className="font-semibold text-white">Sign Up</span>
+            </div>
+          </Link>
+        )}
       </div>
     </nav>
   );
